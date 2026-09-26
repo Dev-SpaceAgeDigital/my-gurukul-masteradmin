@@ -1,13 +1,9 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import { getSessionFromCookies } from '@/lib/auth';
-import ImageKit from 'imagekit';
+import { uploadMedia, deleteMedia } from '@/lib/storage';
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || '',
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || '',
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || ''
-});
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
@@ -31,17 +27,12 @@ export async function POST(request: Request) {
       const file = formData.get('file') as File;
       if (!file) return NextResponse.json({ error: 'No image file provided' }, { status: 400 });
 
-      // Convert to buffer for ImageKit
+      // Convert to buffer and upload to Supabase Storage
       const buffer = Buffer.from(await file.arrayBuffer());
-      
-      const uploadRes = await imagekit.upload({
-        file: buffer,
-        fileName: file.name,
-        folder: `/events/${session.schoolId}`
-      });
+      const uploadRes = await uploadMedia(buffer, file.name, `events/${session.schoolId}`, true);
 
-      url = uploadRes.url;
-      fileId = uploadRes.fileId;
+      url = uploadRes.secure_url;
+      fileId = uploadRes.public_id;
     } else if (mediaType === 'VIDEO') {
       const youtubeUrl = formData.get('url') as string;
       if (!youtubeUrl) return NextResponse.json({ error: 'No video URL provided' }, { status: 400 });
@@ -87,12 +78,12 @@ export async function DELETE(request: Request) {
 
     const media = checkRes.rows[0];
 
-    // If it's an image in ImageKit, delete it there too
+    // If it's an image in Supabase storage, delete it there too
     if (media.mediaType === 'IMAGE' && media.fileId) {
       try {
-        await imagekit.deleteFile(media.fileId);
+        await deleteMedia(media.fileId);
       } catch (ikError) {
-        console.error('ImageKit deletion error (continuing anyway):', ikError);
+        console.error('Storage deletion error (continuing anyway):', ikError);
       }
     }
 

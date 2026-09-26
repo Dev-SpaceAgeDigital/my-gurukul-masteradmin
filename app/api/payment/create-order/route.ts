@@ -2,10 +2,7 @@ import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { checkRateLimit, rateLimitResponse } from '@/lib/security/rateLimit';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +14,18 @@ export async function POST(request: Request) {
     if (!amount || !type || !schoolId) {
       return NextResponse.json({ error: 'Missing payment details' }, { status: 400 });
     }
+
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      return NextResponse.json({ error: 'Razorpay keys not configured' }, { status: 500 });
+    }
+
+    const razorpay = new Razorpay({
+      key_id: keyId,
+      key_secret: keySecret,
+    });
 
     const options = {
       amount: Math.round(amount * 100), // Razorpay expects paise

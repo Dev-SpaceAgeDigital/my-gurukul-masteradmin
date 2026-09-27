@@ -3,11 +3,14 @@ import { db } from '@/lib/db';
 import { trusts, users, schools } from '@/lib/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 
+import { ensureMasterAdminSchema } from '@/lib/ensureMasterAdminSchema';
+
 // Rebuild trigger 20260903-133500
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 async function ensureSchema() {
+  await ensureMasterAdminSchema();
   try {
     await db.execute(sql`ALTER TABLE "Trust" ADD COLUMN IF NOT EXISTS "domainPurchaseUrl" text;`);
     await db.execute(sql`ALTER TABLE "Trust" ADD COLUMN IF NOT EXISTS "brevoApiKey" text;`);

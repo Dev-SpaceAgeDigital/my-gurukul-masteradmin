@@ -3,7 +3,12 @@ import { db } from '@/lib/db';
 import { schools, trusts, users } from '@/lib/db/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 
+import { ensureMasterAdminSchema } from '@/lib/ensureMasterAdminSchema';
+
+export const dynamic = 'force-dynamic';
+
 async function ensureSchema() {
+  await ensureMasterAdminSchema();
   try {
     await db.execute(sql`ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "domainPurchaseUrl" text;`);
     await db.execute(sql`ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "brevoApiKey" text;`);

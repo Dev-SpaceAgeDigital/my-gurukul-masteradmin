@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { masterAdmins } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { ensureMasterAdminSchema } from '@/lib/ensureMasterAdminSchema';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +12,8 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
+
+    await ensureMasterAdminSchema();
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();

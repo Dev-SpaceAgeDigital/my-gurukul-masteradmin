@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { masterAdmins, trusts, schools, alumni, users } from '@/lib/db/schema';
 import { count, eq, sql } from 'drizzle-orm';
+import { ensureMasterAdminSchema } from '@/lib/ensureMasterAdminSchema';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    await ensureMasterAdminSchema();
     const [trustsRes] = await db.select({ count: count() }).from(trusts);
     const [schoolsRes] = await db.select({ count: count() }).from(schools);
     const [alumniRes] = await db.select({ count: count() }).from(alumni);

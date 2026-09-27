@@ -220,6 +220,7 @@ export async function POST(req: Request) {
         totalStandards: cleanInt(item.totalStandards, 10)!,
         currentStudentsNo: cleanInt(item.currentStudentsNo, 0)!,
         isHaveRTE: Boolean(item.isHaveRTE),
+        isSchoolPageEnabled: item.isSchoolPageEnabled !== undefined ? Boolean(item.isSchoolPageEnabled) : true,
         logoUrl: cleanStr(item.logoUrl) || cleanStr(item.schoolLogoUrl) || cleanStr(logoUrl),
         subdomain: cleanStr(item.subdomain) || cleanStr(item.schoolSubdomain) || `${slug}-${createdSchools.length + 1}`,
         customDomain: cleanStr(item.customDomain) || cleanStr(item.schoolCustomDomain),

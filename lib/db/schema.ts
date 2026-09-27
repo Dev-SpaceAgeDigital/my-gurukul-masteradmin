@@ -77,6 +77,7 @@ export const schools = pgTable('School', {
   razorpayKeyId: text('razorpayKeyId'),
   razorpayKeySecret: text('razorpayKeySecret'),
   sponsorshipMode: varchar('sponsorshipMode', { length: 50 }), // null inherits from Trust, or ZAKAT_LILLAH / DONATION
+  isSchoolPageEnabled: boolean('isSchoolPageEnabled').default(true),
   trustId: uuid('trustId').references(() => trusts.id, { onDelete: 'cascade' }),
   status: varchar('status', { length: 50 }).default('ACTIVE'),
   createdAt: timestamp('createdAt').defaultNow(),

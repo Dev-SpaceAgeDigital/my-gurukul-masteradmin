@@ -150,6 +150,7 @@ export async function ensureMasterAdminSchema() {
         "razorpayKeyId" text,
         "razorpayKeySecret" text,
         "sponsorshipMode" varchar(50),
+        "isSchoolPageEnabled" boolean DEFAULT true,
         "trustId" uuid,
         "status" varchar(50) DEFAULT 'ACTIVE',
         "createdAt" timestamp DEFAULT now(),
@@ -168,6 +169,7 @@ export async function ensureMasterAdminSchema() {
       ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "razorpayKeyId" text;
       ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "razorpayKeySecret" text;
       ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "sponsorshipMode" varchar(50);
+      ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "isSchoolPageEnabled" boolean DEFAULT true;
       ALTER TABLE "School" ADD COLUMN IF NOT EXISTS "trustId" uuid;
     `);
 

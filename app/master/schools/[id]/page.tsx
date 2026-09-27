@@ -48,6 +48,23 @@ export default function MasterSchoolDetailsPage({ params }: { params: Promise<{ 
       .catch(() => setLoading(false));
   }, [schoolId]);
 
+  const toggleSchoolPage = async () => {
+    const nextVal = schoolData.isSchoolPageEnabled === false ? true : false;
+    try {
+      const res = await fetch(`/api/master/schools/${schoolId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isSchoolPageEnabled: nextVal }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSchoolData((prev: any) => ({ ...prev, isSchoolPageEnabled: nextVal }));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-none p-12 text-center text-xs font-semibold text-slate-400 border border-slate-200">
@@ -86,6 +103,9 @@ export default function MasterSchoolDetailsPage({ params }: { params: Promise<{ 
                 <h1 className="text-2xl font-extrabold text-[#020637] tracking-tight">{schoolData.schoolName}</h1>
                 <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase">
                   ACTIVE CAMPUS
+                </span>
+                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase border ${schoolData.isSchoolPageEnabled !== false ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                  {schoolData.isSchoolPageEnabled !== false ? 'School Page: Active' : 'School Page: Teachers Only'}
                 </span>
               </div>
               <p className="text-xs text-[#757e93] font-medium mt-1 flex items-center gap-2">
@@ -203,6 +223,34 @@ export default function MasterSchoolDetailsPage({ params }: { params: Promise<{ 
                     <ExternalLink className="w-3 h-3 text-slate-400" />
                   </a>
                 </div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-md border border-slate-100 space-y-2 sm:col-span-2">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-[11px] text-slate-400 font-bold uppercase">Public School Page Access</span>
+                    <div className="text-xs font-bold text-slate-800 mt-0.5 flex items-center gap-2">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${schoolData.isSchoolPageEnabled !== false ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                        {schoolData.isSchoolPageEnabled !== false ? 'Full School Page Enabled' : 'Faculty / Teachers Only'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={toggleSchoolPage}
+                    className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                      schoolData.isSchoolPageEnabled !== false
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                    }`}
+                  >
+                    {schoolData.isSchoolPageEnabled !== false ? 'Disable School Page' : 'Enable School Page'}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  {schoolData.isSchoolPageEnabled !== false
+                    ? 'Sub-admin has access to full public school page (About, Academic Programs, Facilities, Co-Curriculars & Teachers).'
+                    : 'Public school page is disabled. In sub-admin School Page, only School Faculty & Staff Register will be visible.'}
+                </p>
               </div>
             </div>
           </div>

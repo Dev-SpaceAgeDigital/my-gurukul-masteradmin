@@ -68,21 +68,25 @@ export async function PATCH(
 ) {
   try {
     const { id } = await context.params;
-    const { status } = await req.json();
+    const body = await req.json();
 
-    if (!id || !status) {
-      return NextResponse.json({ error: 'School ID and status are required' }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: 'School ID is required' }, { status: 400 });
     }
+
+    const updatePayload: any = { updatedAt: new Date() };
+    if (body.status !== undefined) updatePayload.status = body.status;
+    if (body.isSchoolPageEnabled !== undefined) updatePayload.isSchoolPageEnabled = Boolean(body.isSchoolPageEnabled);
 
     const [updatedSchool] = await db
       .update(schools)
-      .set({ status, updatedAt: new Date() })
+      .set(updatePayload)
       .where(eq(schools.id, id))
       .returning();
 
     return NextResponse.json({ success: true, school: updatedSchool });
   } catch (error: any) {
-    console.error('Error updating school status:', error);
+    console.error('Error updating school:', error);
     return NextResponse.json({ error: error.message || 'Server error' }, { status: 500 });
   }
 }

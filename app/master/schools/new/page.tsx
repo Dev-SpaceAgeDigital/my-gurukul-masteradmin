@@ -26,6 +26,7 @@ export default function OnboardSchoolPage() {
     totalStandards: '10',
     currentStudentsNo: '',
     isHaveRTE: false,
+    isSchoolPageEnabled: true,
     address: '',
     phoneNo: '',
     email: '',
@@ -299,6 +300,32 @@ export default function OnboardSchoolPage() {
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
               />
             </div>
+          </div>
+
+          {/* Public School Page Feature Toggle */}
+          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-4 mt-4">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-800">Public School Page Access</span>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${formData.isSchoolPageEnabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                  {formData.isSchoolPageEnabled ? 'Full School Page Enabled' : 'Faculty / Teachers Only'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium">
+                {formData.isSchoolPageEnabled 
+                  ? 'Sub-admin can manage full public school page (About, Academic Programs, Facilities, Co-Curriculars & Teachers).'
+                  : 'Public school page is disabled. In sub-admin School Page, only School Faculty & Staff Register will be visible; all other sections are hidden.'}
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={formData.isSchoolPageEnabled}
+                onChange={(e) => setFormData({ ...formData, isSchoolPageEnabled: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
         </div>
 

@@ -117,40 +117,54 @@ export async function POST(req: Request) {
       }
     }
 
+    const cleanInt = (v: any, defaultVal: number | null = null): number | null => {
+      if (v === null || v === undefined || v === '') return defaultVal;
+      const parsed = parseInt(String(v), 10);
+      return isNaN(parsed) ? defaultVal : parsed;
+    };
+
+    const cleanStr = (v: any, defaultVal: string | null = null): string | null => {
+      if (v === null || v === undefined) return defaultVal;
+      const s = String(v).trim();
+      return s.length > 0 ? s : defaultVal;
+    };
+
     // 1. Insert School Record
     const [newSchool] = await db.insert(schools).values({
       trustId,
-      schoolName,
-      schoolDiseNo: schoolDiseNo || `DISE-${Date.now()}`,
-      medium: medium || 'English',
-      address: address || null,
-      phoneNo: phoneNo || null,
-      email: email || null,
-      establishYear: establishYear ? parseInt(establishYear) : null,
-      totalStandards: totalStandards ? parseInt(totalStandards) : 10,
-      currentStudentsNo: currentStudentsNo ? parseInt(currentStudentsNo) : 0,
+      schoolName: cleanStr(schoolName)!,
+      schoolDiseNo: cleanStr(schoolDiseNo) || `DISE-${Date.now()}`,
+      medium: cleanStr(medium, 'English')!,
+      address: cleanStr(address),
+      phoneNo: cleanStr(phoneNo),
+      email: cleanStr(email),
+      establishYear: cleanInt(establishYear),
+      totalStandards: cleanInt(totalStandards, 10)!,
+      currentStudentsNo: cleanInt(currentStudentsNo, 0)!,
       isHaveRTE: Boolean(isHaveRTE),
-      logoUrl: logoUrl || null,
-      subdomain: subdomain || null,
-      customDomain: customDomain || null,
-      domainPurchaseUrl: domainPurchaseUrl || null,
-      domainDescription: domainDescription || null,
-      brevoApiKey: brevoApiKey || null,
-      brevoSenderEmail: brevoSenderEmail || null,
-      brevoSenderName: brevoSenderName || null,
-      razorpayKeyId: razorpayKeyId || null,
-      razorpayKeySecret: razorpayKeySecret || null,
-      sponsorshipMode: sponsorshipMode || defaultSponsorshipMode,
+      logoUrl: cleanStr(logoUrl),
+      subdomain: cleanStr(subdomain),
+      customDomain: cleanStr(customDomain),
+      domainPurchaseUrl: cleanStr(domainPurchaseUrl),
+      domainDescription: cleanStr(domainDescription),
+      brevoApiKey: cleanStr(brevoApiKey),
+      brevoSenderEmail: cleanStr(brevoSenderEmail),
+      brevoSenderName: cleanStr(brevoSenderName),
+      razorpayKeyId: cleanStr(razorpayKeyId),
+      razorpayKeySecret: cleanStr(razorpayKeySecret),
+      sponsorshipMode: cleanStr(sponsorshipMode) || defaultSponsorshipMode,
     }).returning();
 
     // 2. Optionally Create SubAdmin user for this school
     let subAdmin = null;
-    if (subAdminEmail && subAdminPassword) {
+    const subAdminEmailToUse = cleanStr(subAdminEmail);
+    const subAdminPasswordToUse = cleanStr(subAdminPassword);
+    if (subAdminEmailToUse && subAdminPasswordToUse) {
       const [createdAdmin] = await db.insert(users).values({
-        name: subAdminName || `${schoolName} SubAdmin`,
-        email: subAdminEmail,
-        password: subAdminPassword,
-        phoneNo: subAdminPhone || null,
+        name: cleanStr(subAdminName) || `${schoolName} SubAdmin`,
+        email: subAdminEmailToUse,
+        password: subAdminPasswordToUse,
+        phoneNo: cleanStr(subAdminPhone),
         role: 'SUB_ADMIN',
         schoolId: newSchool.id
       }).returning();

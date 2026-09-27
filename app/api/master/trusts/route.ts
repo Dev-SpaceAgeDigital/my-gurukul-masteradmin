@@ -126,33 +126,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Trust Name, Subdomain Slug, SuperAdmin Email & Password are required' }, { status: 400 });
     }
 
+    const cleanInt = (v: any, defaultVal: number | null = null): number | null => {
+      if (v === null || v === undefined || v === '') return defaultVal;
+      const parsed = parseInt(String(v), 10);
+      return isNaN(parsed) ? defaultVal : parsed;
+    };
+
+    const cleanStr = (v: any, defaultVal: string | null = null): string | null => {
+      if (v === null || v === undefined) return defaultVal;
+      const s = String(v).trim();
+      return s.length > 0 ? s : defaultVal;
+    };
+
     const effectiveSponsorshipMode = (sponsorshipMode === 'DONATION' || sponsorshipMode === 'ZAKAT_LILLAH') ? sponsorshipMode : 'ZAKAT_LILLAH';
 
     // 1. Insert Trust Record
     const [newTrust] = await db.insert(trusts).values({
-      trustName,
-      slug,
-      registrationNo: registrationNo || `REG-${Date.now()}`,
-      establishmentYear: establishmentYear ? parseInt(establishmentYear) : null,
-      presidentName: presidentName || null,
-      presidentNo: presidentNo || null,
+      trustName: cleanStr(trustName)!,
+      slug: cleanStr(slug)!,
+      registrationNo: cleanStr(registrationNo) || `REG-${Date.now()}`,
+      establishmentYear: cleanInt(establishmentYear),
+      presidentName: cleanStr(presidentName),
+      presidentNo: cleanStr(presidentNo),
       trusteesName: trusteesName ? (Array.isArray(trusteesName) ? trusteesName : [trusteesName]) : [],
       trusteesNo: trusteesNo ? (Array.isArray(trusteesNo) ? trusteesNo : [trusteesNo]) : [],
-      customDomain: customDomain || null,
-      domainPurchaseUrl: domainPurchaseUrl || null,
-      logoUrl: logoUrl || null,
-      primaryColor: primaryColor || '#0f172a',
-      bankAccountDetails: bankAccountDetails || null,
-      taxExemptionNo: taxExemptionNo || null,
+      customDomain: cleanStr(customDomain),
+      domainPurchaseUrl: cleanStr(domainPurchaseUrl),
+      logoUrl: cleanStr(logoUrl),
+      primaryColor: cleanStr(primaryColor, '#0f172a')!,
+      bankAccountDetails: cleanStr(bankAccountDetails),
+      taxExemptionNo: cleanStr(taxExemptionNo),
       sponsorshipMode: effectiveSponsorshipMode,
-      razorpayKeyId: razorpayKeyId || null,
-      razorpayKeySecret: razorpayKeySecret || null,
-      brevoApiKey: brevoApiKey || null,
-      brevoSenderEmail: brevoSenderEmail || null,
-      brevoSenderName: brevoSenderName || null,
-      plan: plan || 'PRO',
-      maxSchools: maxSchools ? parseInt(maxSchools) : 10,
-      maxAlumni: maxAlumni ? parseInt(maxAlumni) : 10000,
+      razorpayKeyId: cleanStr(razorpayKeyId),
+      razorpayKeySecret: cleanStr(razorpayKeySecret),
+      brevoApiKey: cleanStr(brevoApiKey),
+      brevoSenderEmail: cleanStr(brevoSenderEmail),
+      brevoSenderName: cleanStr(brevoSenderName),
+      plan: cleanStr(plan, 'PRO')!,
+      maxSchools: cleanInt(maxSchools, 10)!,
+      maxAlumni: cleanInt(maxAlumni, 10000)!,
       status: 'ACTIVE'
     }).returning();
 
@@ -181,7 +193,11 @@ export async function POST(req: Request) {
         customDomain: schoolCustomDomain,
         domainDescription: schoolDomainDescription,
         razorpayKeyId: schoolRazorpayKeyId,
-        razorpayKeySecret: schoolRazorpayKeySecret
+        razorpayKeySecret: schoolRazorpayKeySecret,
+        subAdminEmail,
+        subAdminPassword,
+        subAdminName,
+        subAdminPhone
       });
     }
 
@@ -190,27 +206,27 @@ export async function POST(req: Request) {
 
     for (const item of schoolsToCreate) {
       const [createdSchool] = await db.insert(schools).values({
-        schoolName: item.schoolName,
-        schoolDiseNo: item.schoolDiseNo || `DISE-${Date.now()}-${Math.floor(Math.random()*1000)}`,
-        medium: item.medium || 'English',
-        address: item.address || item.schoolAddress || null,
-        phoneNo: item.phoneNo || item.schoolPhone || null,
-        email: item.email || item.schoolEmail || null,
-        establishYear: item.establishYear ? parseInt(item.establishYear) : null,
-        totalStandards: item.totalStandards ? parseInt(item.totalStandards) : 10,
-        currentStudentsNo: item.currentStudentsNo ? parseInt(item.currentStudentsNo) : 0,
+        schoolName: cleanStr(item.schoolName)!,
+        schoolDiseNo: cleanStr(item.schoolDiseNo) || `DISE-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+        medium: cleanStr(item.medium, 'English')!,
+        address: cleanStr(item.address) || cleanStr(item.schoolAddress),
+        phoneNo: cleanStr(item.phoneNo) || cleanStr(item.schoolPhone),
+        email: cleanStr(item.email) || cleanStr(item.schoolEmail),
+        establishYear: cleanInt(item.establishYear),
+        totalStandards: cleanInt(item.totalStandards, 10)!,
+        currentStudentsNo: cleanInt(item.currentStudentsNo, 0)!,
         isHaveRTE: Boolean(item.isHaveRTE),
-        logoUrl: item.logoUrl || item.schoolLogoUrl || logoUrl || null,
-        subdomain: item.subdomain || item.schoolSubdomain || `${slug}-${createdSchools.length + 1}`,
-        customDomain: item.customDomain || item.schoolCustomDomain || null,
-        domainPurchaseUrl: item.domainPurchaseUrl || item.schoolDomainPurchaseUrl || null,
-        domainDescription: item.domainDescription || item.schoolDomainDescription || null,
-        razorpayKeyId: item.razorpayKeyId || item.schoolRazorpayKeyId || razorpayKeyId || null,
-        razorpayKeySecret: item.razorpayKeySecret || item.schoolRazorpayKeySecret || razorpayKeySecret || null,
-        brevoApiKey: item.brevoApiKey || item.schoolBrevoApiKey || null,
-        brevoSenderEmail: item.brevoSenderEmail || item.schoolBrevoSenderEmail || null,
-        brevoSenderName: item.brevoSenderName || item.schoolBrevoSenderName || null,
-        sponsorshipMode: item.sponsorshipMode || item.schoolSponsorshipMode || effectiveSponsorshipMode,
+        logoUrl: cleanStr(item.logoUrl) || cleanStr(item.schoolLogoUrl) || cleanStr(logoUrl),
+        subdomain: cleanStr(item.subdomain) || cleanStr(item.schoolSubdomain) || `${slug}-${createdSchools.length + 1}`,
+        customDomain: cleanStr(item.customDomain) || cleanStr(item.schoolCustomDomain),
+        domainPurchaseUrl: cleanStr(item.domainPurchaseUrl) || cleanStr(item.schoolDomainPurchaseUrl),
+        domainDescription: cleanStr(item.domainDescription) || cleanStr(item.schoolDomainDescription),
+        razorpayKeyId: cleanStr(item.razorpayKeyId) || cleanStr(item.schoolRazorpayKeyId) || cleanStr(razorpayKeyId),
+        razorpayKeySecret: cleanStr(item.razorpayKeySecret) || cleanStr(item.schoolRazorpayKeySecret) || cleanStr(razorpayKeySecret),
+        brevoApiKey: cleanStr(item.brevoApiKey) || cleanStr(item.schoolBrevoApiKey),
+        brevoSenderEmail: cleanStr(item.brevoSenderEmail) || cleanStr(item.schoolBrevoSenderEmail),
+        brevoSenderName: cleanStr(item.brevoSenderName) || cleanStr(item.schoolBrevoSenderName),
+        sponsorshipMode: cleanStr(item.sponsorshipMode) || cleanStr(item.schoolSponsorshipMode) || effectiveSponsorshipMode,
         trustId: newTrust.id
       }).returning();
 
@@ -218,12 +234,14 @@ export async function POST(req: Request) {
       createdSchools.push(createdSchool);
 
       // Provision SubAdmin for this school if credentials provided
-      if (item.subAdminEmail && item.subAdminPassword) {
+      const subAdminEmailToUse = cleanStr(item.subAdminEmail);
+      const subAdminPasswordToUse = cleanStr(item.subAdminPassword);
+      if (subAdminEmailToUse && subAdminPasswordToUse) {
         await db.insert(users).values({
-          name: item.subAdminName || `${item.schoolName} Officer`,
-          email: item.subAdminEmail,
-          password: item.subAdminPassword,
-          phoneNo: item.subAdminPhone || null,
+          name: cleanStr(item.subAdminName) || `${item.schoolName} Officer`,
+          email: subAdminEmailToUse,
+          password: subAdminPasswordToUse,
+          phoneNo: cleanStr(item.subAdminPhone),
           role: 'SUB_ADMIN',
           schoolId: createdSchool.id
         });
@@ -232,10 +250,10 @@ export async function POST(req: Request) {
 
     // 3. Create Primary SuperAdmin User
     const [newAdmin] = await db.insert(users).values({
-      name: superAdminName || `${trustName} SuperAdmin`,
-      email: superAdminEmail,
-      password: superAdminPassword,
-      phoneNo: superAdminPhone || null,
+      name: cleanStr(superAdminName) || `${trustName} SuperAdmin`,
+      email: cleanStr(superAdminEmail)!,
+      password: cleanStr(superAdminPassword)!,
+      phoneNo: cleanStr(superAdminPhone),
       role: 'SUPER_ADMIN',
       schoolId: firstSchoolId
     }).returning();

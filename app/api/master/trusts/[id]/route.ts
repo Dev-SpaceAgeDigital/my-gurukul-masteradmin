@@ -163,80 +163,94 @@ export async function PUT(
         if (!item.schoolName || !item.schoolName.trim()) continue;
 
         let schoolId = item.id;
+        const cleanInt = (v: any, defaultVal: number | null = null): number | null => {
+          if (v === null || v === undefined || v === '') return defaultVal;
+          const parsed = parseInt(String(v), 10);
+          return isNaN(parsed) ? defaultVal : parsed;
+        };
+
+        const cleanStr = (v: any, defaultVal: string | null = null): string | null => {
+          if (v === null || v === undefined) return defaultVal;
+          const s = String(v).trim();
+          return s.length > 0 ? s : defaultVal;
+        };
+
         if (schoolId) {
           // Update existing school
           await db.update(schools).set({
-            schoolName: item.schoolName,
-            schoolDiseNo: item.schoolDiseNo || null,
-            medium: item.medium || 'English',
-            address: item.address || item.schoolAddress || null,
-            phoneNo: item.phoneNo || item.schoolPhone || null,
-            email: item.email || item.schoolEmail || null,
-            establishYear: item.establishYear ? parseInt(item.establishYear) : null,
-            totalStandards: item.totalStandards ? parseInt(item.totalStandards) : 10,
-            currentStudentsNo: item.currentStudentsNo ? parseInt(item.currentStudentsNo) : 0,
+            schoolName: cleanStr(item.schoolName)!,
+            schoolDiseNo: cleanStr(item.schoolDiseNo),
+            medium: cleanStr(item.medium, 'English')!,
+            address: cleanStr(item.address) || cleanStr(item.schoolAddress),
+            phoneNo: cleanStr(item.phoneNo) || cleanStr(item.schoolPhone),
+            email: cleanStr(item.email) || cleanStr(item.schoolEmail),
+            establishYear: cleanInt(item.establishYear),
+            totalStandards: cleanInt(item.totalStandards, 10)!,
+            currentStudentsNo: cleanInt(item.currentStudentsNo, 0)!,
             isHaveRTE: Boolean(item.isHaveRTE),
-            logoUrl: item.logoUrl || item.schoolLogoUrl || logoUrl || null,
-            subdomain: item.subdomain || item.schoolSubdomain || slug,
-            customDomain: item.customDomain || item.schoolCustomDomain || null,
-            domainPurchaseUrl: item.domainPurchaseUrl || item.schoolDomainPurchaseUrl || null,
-            domainDescription: item.domainDescription || item.schoolDomainDescription || null,
-            razorpayKeyId: item.razorpayKeyId || item.schoolRazorpayKeyId || razorpayKeyId || null,
-            razorpayKeySecret: item.razorpayKeySecret || item.schoolRazorpayKeySecret || razorpayKeySecret || null,
-            brevoApiKey: item.brevoApiKey || item.schoolBrevoApiKey || null,
-            brevoSenderEmail: item.brevoSenderEmail || item.schoolBrevoSenderEmail || null,
-            brevoSenderName: item.brevoSenderName || item.schoolBrevoSenderName || null,
+            logoUrl: cleanStr(item.logoUrl) || cleanStr(item.schoolLogoUrl) || cleanStr(logoUrl),
+            subdomain: cleanStr(item.subdomain) || cleanStr(item.schoolSubdomain) || slug,
+            customDomain: cleanStr(item.customDomain) || cleanStr(item.schoolCustomDomain),
+            domainPurchaseUrl: cleanStr(item.domainPurchaseUrl) || cleanStr(item.schoolDomainPurchaseUrl),
+            domainDescription: cleanStr(item.domainDescription) || cleanStr(item.schoolDomainDescription),
+            razorpayKeyId: cleanStr(item.razorpayKeyId) || cleanStr(item.schoolRazorpayKeyId) || cleanStr(razorpayKeyId),
+            razorpayKeySecret: cleanStr(item.razorpayKeySecret) || cleanStr(item.schoolRazorpayKeySecret) || cleanStr(razorpayKeySecret),
+            brevoApiKey: cleanStr(item.brevoApiKey) || cleanStr(item.schoolBrevoApiKey),
+            brevoSenderEmail: cleanStr(item.brevoSenderEmail) || cleanStr(item.schoolBrevoSenderEmail),
+            brevoSenderName: cleanStr(item.brevoSenderName) || cleanStr(item.schoolBrevoSenderName),
             updatedAt: new Date()
           }).where(eq(schools.id, schoolId));
         } else {
           // Insert new school under this trust
           const [newSchool] = await db.insert(schools).values({
-            schoolName: item.schoolName,
-            schoolDiseNo: item.schoolDiseNo || `DISE-${Date.now()}`,
-            medium: item.medium || 'English',
-            address: item.address || item.schoolAddress || null,
-            phoneNo: item.phoneNo || item.schoolPhone || null,
-            email: item.email || item.schoolEmail || null,
-            establishYear: item.establishYear ? parseInt(item.establishYear) : null,
-            totalStandards: item.totalStandards ? parseInt(item.totalStandards) : 10,
-            currentStudentsNo: item.currentStudentsNo ? parseInt(item.currentStudentsNo) : 0,
+            schoolName: cleanStr(item.schoolName)!,
+            schoolDiseNo: cleanStr(item.schoolDiseNo) || `DISE-${Date.now()}`,
+            medium: cleanStr(item.medium, 'English')!,
+            address: cleanStr(item.address) || cleanStr(item.schoolAddress),
+            phoneNo: cleanStr(item.phoneNo) || cleanStr(item.schoolPhone),
+            email: cleanStr(item.email) || cleanStr(item.schoolEmail),
+            establishYear: cleanInt(item.establishYear),
+            totalStandards: cleanInt(item.totalStandards, 10)!,
+            currentStudentsNo: cleanInt(item.currentStudentsNo, 0)!,
             isHaveRTE: Boolean(item.isHaveRTE),
-            logoUrl: item.logoUrl || item.schoolLogoUrl || logoUrl || null,
-            subdomain: item.subdomain || item.schoolSubdomain || slug,
-            customDomain: item.customDomain || item.schoolCustomDomain || null,
-            domainPurchaseUrl: item.domainPurchaseUrl || item.schoolDomainPurchaseUrl || null,
-            domainDescription: item.domainDescription || item.schoolDomainDescription || null,
-            razorpayKeyId: item.razorpayKeyId || item.schoolRazorpayKeyId || razorpayKeyId || null,
-            razorpayKeySecret: item.razorpayKeySecret || item.schoolRazorpayKeySecret || razorpayKeySecret || null,
-            brevoApiKey: item.brevoApiKey || item.schoolBrevoApiKey || null,
-            brevoSenderEmail: item.brevoSenderEmail || item.schoolBrevoSenderEmail || null,
-            brevoSenderName: item.brevoSenderName || item.schoolBrevoSenderName || null,
+            logoUrl: cleanStr(item.logoUrl) || cleanStr(item.schoolLogoUrl) || cleanStr(logoUrl),
+            subdomain: cleanStr(item.subdomain) || cleanStr(item.schoolSubdomain) || slug,
+            customDomain: cleanStr(item.customDomain) || cleanStr(item.schoolCustomDomain),
+            domainPurchaseUrl: cleanStr(item.domainPurchaseUrl) || cleanStr(item.schoolDomainPurchaseUrl),
+            domainDescription: cleanStr(item.domainDescription) || cleanStr(item.schoolDomainDescription),
+            razorpayKeyId: cleanStr(item.razorpayKeyId) || cleanStr(item.schoolRazorpayKeyId) || cleanStr(razorpayKeyId),
+            razorpayKeySecret: cleanStr(item.razorpayKeySecret) || cleanStr(item.schoolRazorpayKeySecret) || cleanStr(razorpayKeySecret),
+            brevoApiKey: cleanStr(item.brevoApiKey) || cleanStr(item.schoolBrevoApiKey),
+            brevoSenderEmail: cleanStr(item.brevoSenderEmail) || cleanStr(item.schoolBrevoSenderEmail),
+            brevoSenderName: cleanStr(item.brevoSenderName) || cleanStr(item.schoolBrevoSenderName),
             trustId: id
           }).returning();
           schoolId = newSchool.id;
         }
 
         // SubAdmin Officer creation/update if credentials provided
-        if (item.subAdminEmail && item.subAdminEmail.trim()) {
-          const existingSubAdmin = await db.select().from(users).where(eq(users.email, item.subAdminEmail.trim()));
+        const subAdminEmailToUse = cleanStr(item.subAdminEmail);
+        const subAdminPasswordToUse = cleanStr(item.subAdminPassword);
+        if (subAdminEmailToUse) {
+          const existingSubAdmin = await db.select().from(users).where(eq(users.email, subAdminEmailToUse));
           if (existingSubAdmin.length > 0) {
             const setPayload: any = {
-              name: item.subAdminName || `${item.schoolName} Officer`,
-              phoneNo: item.subAdminPhone ? item.subAdminPhone.trim() : null,
+              name: cleanStr(item.subAdminName) || `${item.schoolName} Officer`,
+              phoneNo: cleanStr(item.subAdminPhone),
               schoolId: schoolId,
               role: 'SUB_ADMIN',
               updatedAt: new Date()
             };
-            if (item.subAdminPassword && item.subAdminPassword.trim()) {
-              setPayload.password = item.subAdminPassword.trim();
+            if (subAdminPasswordToUse) {
+              setPayload.password = subAdminPasswordToUse;
             }
             await db.update(users).set(setPayload).where(eq(users.id, existingSubAdmin[0].id));
-          } else if (item.subAdminPassword && item.subAdminPassword.trim()) {
+          } else if (subAdminPasswordToUse) {
             await db.insert(users).values({
-              name: item.subAdminName || `${item.schoolName} Officer`,
-              email: item.subAdminEmail.trim(),
-              password: item.subAdminPassword.trim(),
-              phoneNo: item.subAdminPhone ? item.subAdminPhone.trim() : null,
+              name: cleanStr(item.subAdminName) || `${item.schoolName} Officer`,
+              email: subAdminEmailToUse,
+              password: subAdminPasswordToUse,
+              phoneNo: cleanStr(item.subAdminPhone),
               role: 'SUB_ADMIN',
               schoolId: schoolId
             });

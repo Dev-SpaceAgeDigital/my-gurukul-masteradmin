@@ -119,7 +119,11 @@ export async function POST(req: Request) {
       schoolDomainDescription,
       schoolRazorpayKeyId,
       schoolRazorpayKeySecret,
-      schoolSponsorshipMode
+      schoolSponsorshipMode,
+      subAdminEmail,
+      subAdminPassword,
+      subAdminName,
+      subAdminPhone
     } = body;
 
     if (!trustName || !slug || !superAdminEmail || !superAdminPassword) {

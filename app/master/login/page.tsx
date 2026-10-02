@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 import { Crown, Lock, Mail, ArrowRight } from 'lucide-react';
 
 export default function MasterLoginPage() {
-  const [email, setEmail] = useState('admin@edutrust.org');
-  const [password, setPassword] = useState('AQwIKwVowlls1Lrs');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -57,8 +57,9 @@ export default function MasterLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.org"
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-[#020637] focus:outline-none focus:bg-white focus:border-[#0964e5] focus:ring-2 focus:ring-[#0964e5]/20 transition-all font-medium"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-[#020637] placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#0964e5] focus:ring-2 focus:ring-[#0964e5]/20 transition-all font-medium"
               />
             </div>
           </div>
@@ -71,8 +72,9 @@ export default function MasterLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
                 required
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-[#020637] focus:outline-none focus:bg-white focus:border-[#0964e5] focus:ring-2 focus:ring-[#0964e5]/20 transition-all font-medium"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-3 text-sm text-[#020637] placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#0964e5] focus:ring-2 focus:ring-[#0964e5]/20 transition-all font-medium"
               />
             </div>
           </div>

@@ -342,8 +342,22 @@ export default function TrustInspectPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
               <div>
-                <span className="text-slate-400 font-semibold block">80G Tax Exemption No</span>
-                <span className="font-mono font-bold text-slate-900 text-sm">{trustData.taxExemptionNo || 'N/A'}</span>
+                <span className="text-slate-400 font-semibold block">80G Tax Exemption & Donor Receipts</span>
+                {trustData.is80GEnabled || trustData.taxExemptionNo ? (
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 text-[11px] font-extrabold px-2.5 py-1 rounded-md border border-emerald-200">
+                      80G Active
+                    </span>
+                    <span className="font-mono font-bold text-slate-900 text-xs bg-slate-100 px-2.5 py-1 rounded-md">
+                      {trustData.taxExemptionNo || 'Configured'}
+                    </span>
+                    <span className="text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
+                      Min. Request: ₹{trustData.min80GAmount || 500}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-slate-500 font-medium text-xs mt-1 block">Disabled / Not Configured</span>
+                )}
               </div>
               <div>
                 <span className="text-slate-400 font-semibold block">SaaS Subscription Limits</span>

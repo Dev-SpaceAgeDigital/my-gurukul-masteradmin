@@ -160,6 +160,8 @@ export async function POST(req: Request) {
       primaryColor: cleanStr(primaryColor, '#0f172a')!,
       bankAccountDetails: cleanStr(bankAccountDetails),
       taxExemptionNo: cleanStr(taxExemptionNo),
+      is80GEnabled: Boolean(body.is80GEnabled || taxExemptionNo),
+      min80GAmount: cleanInt(body.min80GAmount, 500) ? String(cleanInt(body.min80GAmount, 500)) : '500',
       sponsorshipMode: effectiveSponsorshipMode,
       razorpayKeyId: cleanStr(razorpayKeyId),
       razorpayKeySecret: cleanStr(razorpayKeySecret),

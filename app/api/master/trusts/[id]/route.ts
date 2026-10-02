@@ -106,6 +106,8 @@ export async function PUT(
         primaryColor: primaryColor || '#0f172a',
         bankAccountDetails: bankAccountDetails || null,
         taxExemptionNo: taxExemptionNo || null,
+        is80GEnabled: Boolean(body.is80GEnabled || taxExemptionNo),
+        min80GAmount: body.min80GAmount ? String(parseInt(body.min80GAmount) || 500) : '500',
         ...(effectiveSponsorshipMode ? { sponsorshipMode: effectiveSponsorshipMode } : {}),
         razorpayKeyId: razorpayKeyId || null,
         razorpayKeySecret: razorpayKeySecret || null,

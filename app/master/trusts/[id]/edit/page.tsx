@@ -48,6 +48,8 @@ export default function EditTrustWizardPage({ params }: { params: Promise<{ id: 
     maxSchools: '10',
     maxAlumni: '10000',
     taxExemptionNo: '',
+    is80GEnabled: false,
+    min80GAmount: '500',
     sponsorshipMode: 'ZAKAT_LILLAH',
 
     // SuperAdmin Credentials
@@ -90,6 +92,8 @@ export default function EditTrustWizardPage({ params }: { params: Promise<{ id: 
             maxSchools: t.maxSchools ? String(t.maxSchools) : '10',
             maxAlumni: t.maxAlumni ? String(t.maxAlumni) : '10000',
             taxExemptionNo: t.taxExemptionNo || '',
+            is80GEnabled: Boolean(t.is80GEnabled || t.taxExemptionNo),
+            min80GAmount: t.min80GAmount ? String(t.min80GAmount) : '500',
             sponsorshipMode: t.sponsorshipMode || 'ZAKAT_LILLAH',
 
             superAdminId: superAdminUser.id || '',
@@ -547,6 +551,68 @@ export default function EditTrustWizardPage({ params }: { params: Promise<{ id: 
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* 80G TAX EXEMPTION & DONOR RECEIPT FRAMEWORK */}
+              <div className="p-5 bg-gradient-to-br from-slate-50 to-emerald-50/40 rounded-xl border border-emerald-100/80 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-emerald-600" />
+                      <span>80G Tax Exemption & Donor Receipt Framework</span>
+                    </h3>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Enable donors and alumni to request official 80G tax exemption certificates on eligible donations.
+                    </p>
+                  </div>
+                  <label className="inline-flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-emerald-200 shadow-xs">
+                    <input
+                      type="checkbox"
+                      checked={formData.is80GEnabled}
+                      onChange={(e) => setFormData({ ...formData, is80GEnabled: e.target.checked })}
+                      className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+                    />
+                    <span className="text-xs font-bold text-slate-800">Enable 80G Receipts</span>
+                  </label>
+                </div>
+
+                {formData.is80GEnabled && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-emerald-100 animate-in fade-in duration-300">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        80G Registration / Exemption Certificate No *
+                      </label>
+                      <input
+                        type="text"
+                        required={formData.is80GEnabled}
+                        value={formData.taxExemptionNo}
+                        onChange={(e) => setFormData({ ...formData, taxExemptionNo: e.target.value.toUpperCase() })}
+                        placeholder="e.g. AAAT0123DF20214 / 80G/CIT/VAD/2022-23"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono focus:border-emerald-600 focus:outline-none"
+                      />
+                      <span className="text-[10px] text-slate-500">Official Income Tax Department 80G certificate registration number.</span>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">
+                        Minimum Donation Amount for 80G Request (₹) *
+                      </label>
+                      <input
+                        type="number"
+                        min="100"
+                        step="100"
+                        required={formData.is80GEnabled}
+                        value={formData.min80GAmount}
+                        onChange={(e) => setFormData({ ...formData, min80GAmount: e.target.value })}
+                        placeholder="e.g. 500 or 1000"
+                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-bold focus:border-emerald-600 focus:outline-none"
+                      />
+                      <span className="text-[10px] text-slate-500">
+                        Alumni / donors contributing ₹{formData.min80GAmount || '500'} or more can enter their PAN to request 80G tax exemption.
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* SuperAdmin User Subsection */}

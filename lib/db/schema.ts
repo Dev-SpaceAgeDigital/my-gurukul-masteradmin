@@ -41,6 +41,8 @@ export const trusts = pgTable('Trust', {
   brevoSenderName: varchar('brevoSenderName', { length: 255 }),
   bankAccountDetails: text('bankAccountDetails'),
   taxExemptionNo: varchar('taxExemptionNo', { length: 100 }),
+  is80GEnabled: boolean('is80GEnabled').default(false),
+  min80GAmount: decimal('min80GAmount', { precision: 12, scale: 2 }).default('500'),
   sponsorshipMode: varchar('sponsorshipMode', { length: 50 }).default('ZAKAT_LILLAH'), // ZAKAT_LILLAH or DONATION
   status: varchar('status', { length: 50 }).default('ACTIVE'),
   plan: varchar('plan', { length: 50 }).default('PRO'),
